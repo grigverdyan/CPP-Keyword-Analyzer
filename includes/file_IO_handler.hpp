@@ -13,12 +13,16 @@ class IOFileHandler
         ~IOFileHandler() = default;
 
     public:
-        void    readFile();
-        
-    private:
+        std::string&    getHandledInput();
 
     private:
-        const std::string file_;
+        std::string     skipSingleLineComments(std::string line);
+        void            skipMultiLineComments();
+        void            readFile();
+        void            dataHandler(); 
+    private:
+        const std::string           file_;
+        std::string                 input_;
 };
 
 #endif  // IO_FILE_HANDLER_H

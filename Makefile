@@ -1,4 +1,5 @@
 .PHONY: all re clean fclean debug gcov lcov clean_gcda clean_gcno fclean_glcov
+EXECUTABLE	=	analyzer.exe
 SRCS		=	sources
 SOURCES		=	$(wildcard $(SRCS)/*.cpp)
 INCLUDES	=	-Iincludes
@@ -8,7 +9,6 @@ CC			=	g++
 CXXFLAGS	=	-Wall -Wextra -Werror -g -ggdb3
 MKDIR		= 	mkdir -p
 STANDARD	=	-std=c++17
-EXECUTABLE	=	analyzer.exe
 RM			=	rm -rf
 LCOVTEST	=	$(EXECUTABLE:.exe=.info)
 BROWSER		=	google-chrome
