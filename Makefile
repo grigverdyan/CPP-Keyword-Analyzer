@@ -35,11 +35,11 @@ fclean : clean
 	@echo "Cleaned all"
 
 debug :
-	gdb $(EXECUTABLE) input.cpp output.txt core
+	gdb $(EXECUTABLE) input.cpp core
 
 gcov :
 	$(CC) $(SOURCES) --coverage -o $(EXECUTABLE)
-	./$(EXECUTABLE) input.txt output.txt
+	./$(EXECUTABLE) input.cpp
 
 lcov :
 	lcov -t "program" -o $(LCOVTEST) -c -d .
