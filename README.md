@@ -1,6 +1,8 @@
 # CPP-Keyword-Analyzer
 Picsart Labs Project
 
+[STATUS] -> Not fineished fully yet
+
 Write a program that analyzes the C++ file and prints the number of
 keywords (use the following list C++ keywords - cppreference.com ),
 functions, variables and
