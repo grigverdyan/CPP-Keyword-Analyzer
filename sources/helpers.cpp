@@ -2,6 +2,9 @@
 
 #include <vector>
 
+/*
+ * Global function which checks file extension (cpp).
+ */
 bool    isValidExtension(const std::string& file)
 {
     if (file.length() < 5)

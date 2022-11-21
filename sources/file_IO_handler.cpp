@@ -3,10 +3,20 @@
 #include "file_IO_handler.hpp"
 #include "error_message.hpp"
 
+
+/*
+ * Constructor with parameters.
+ * Gets name of file
+ */
 IOFileHandler::IOFileHandler(const std::string& file)
     : file_{std::move(file)}
 {}
 
+/*
+ * Member function which read open file,
+ * reads it, and fill the data in into the
+ * input_ member variable.
+ */
 void    IOFileHandler::readFile()
 {
     std::fstream    inData;
@@ -30,6 +40,10 @@ void    IOFileHandler::readFile()
     inData.close();
 }
 
+/*
+ * Member function which skips single line comments of file data
+ * and do not put it into the input_ member variable. 
+ */
 std::string IOFileHandler::skipSingleLineComments(std::string line)
 {
     auto  commentIndex = line.find("//");
@@ -39,6 +53,10 @@ std::string IOFileHandler::skipSingleLineComments(std::string line)
     return line.substr(0, commentIndex);
 }
 
+/*
+ * Member function which skips mutiple line comments of file
+ * data and do not put these into the input_ member variable.
+ */
 void    IOFileHandler::skipMultiLineComments()
 {
     while (true)
@@ -57,12 +75,20 @@ void    IOFileHandler::skipMultiLineComments()
     }
 }
 
+/*
+ * Member function which can be characterized as main.
+ * Does reading file, with skipping comments.
+ */
 void    IOFileHandler::dataHandler()
 {
     readFile();
     skipMultiLineComments();
 }
 
+/*
+ * Member function which calls the main Member function
+ * and returns the input_ member variable.
+ */
 std::string&    IOFileHandler::getHandledInput()
 {
     dataHandler();

@@ -7,37 +7,24 @@
 #include "file_IO_handler.hpp"
 #include "analyzer.hpp"
 
-int main(int argc, char* argv[])
+int main(int argc, char* argv[]) try
 {
-    try {
-        if (argc < 2) {
-            throw ErrorMessage("No input file included!\n");
-        }
-        if (isValidExtension(argv[1]) == false) {
-            throw ErrorMessage("Included file must have a valid CPP file extension!\n");
-        }
-    } catch(const ErrorMessage& error) {
-        error.printErrorMessage();
-        return EXIT_FAILURE;
+    if (argc < 2) {
+        throw ErrorMessage("No input file included!\n");
     }
+    if (isValidExtension(argv[1]) == false) {
+        throw ErrorMessage("Included file must have a valid CPP file extension!\n");
+    }
+    
     std::string fileName = argv[1];
 
-    try {
-        auto    file = std::make_shared<IOFileHandler>("data/" + fileName);
-        auto    analysis = std::make_shared<Analyzer>(file->getHandledInput());    
-        analysis->startAnalysis();
-
-    } catch (const ErrorMessage& error) {
-        error.printErrorMessage();
-        return EXIT_FAILURE;
-    }
-    //std::string handledInput = file->getHandledInput();
-    /*
-    //std::cout << handledInput;
-    std::stringstream str(handledInput);
-    std::string word;
-    while (str >> word)
-        std::cout << word << std::endl;
-*/
+    auto    file = std::make_shared<IOFileHandler>("data/" + fileName);
+    auto    analysis = std::make_shared<Analyzer>(file->getHandledInput());    
+    analysis->startAnalysis();
+    
     return EXIT_SUCCESS;
+
+} catch (const ErrorMessage& error) {
+    error.printErrorMessage();
+    return EXIT_FAILURE;
 }

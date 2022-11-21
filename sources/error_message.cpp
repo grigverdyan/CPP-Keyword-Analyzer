@@ -2,32 +2,27 @@
 
 #include "error_message.hpp"
 
-
-
+/*
+ * Constructor with parameters which gets the 
+ * error message.
+ */
 ErrorMessage::ErrorMessage(const std::string& src)
-    : errorMessage_{src}, errorLine_{0}
+    : errorMessage_{src}
 {}
 
-ErrorMessage::ErrorMessage(const std::string& src, size_t line)
-    : errorMessage_{src}, errorLine_{line}
-{}
-
+/*
+ * Member function which prints the error message.
+ */
 void    ErrorMessage::printErrorMessage() const
 {
-    if (errorLine_ != 0) {
-        std::cerr << "ERROR at " << std::to_string(errorLine_)
-                  << "line: " << errorMessage_;
-    } else {
-        std::cerr << "ERROR: " << errorMessage_;
-    }
+    std::cerr << "ERROR: " << errorMessage_;
 }
 
+/*
+ * Member Function -> getter which returns the error
+ * message.
+ */
 const std::string&    ErrorMessage::getErrorMessage() const
 {
     return errorMessage_;
-}
-
-size_t  ErrorMessage::getErrorLine() const
-{
-    return errorLine_;
 }
