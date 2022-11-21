@@ -61,23 +61,165 @@ void    Analyzer::addUserDefinedType(std::string& body, const std::string& udTyp
     identifierTypes_.push_back(word);
     std::string typeName = word;
     std::cout << "In " << typeName << " " << udType << ":\n";
+    sBody.clear();
+    
+    auto typeIndex = body.find(typeName);
+    std::string tBody = body.substr(typeIndex + typeName.size(), body.size());
+    body = tBody;
+
     size_t  propertyCount = 0;
+    std::vector<std::string>    vBody;
+    while (true)
+    {
+        auto index = body.find("\n");
+        if (index != std::string::npos) {
+            std::string temp = body.substr(index + 1, body.size());
+            vBody.push_back(body.substr(0, index));
+            body = temp;
+        } else {
+            break;
+        }
+    }
+
+    size_t  i = 0;
+    while (!vBody[i].empty())
+    {
+        auto functionStart = vBody[i].find("(");
+        if (functionStart != std::string::npos) {
+            i = functionAnalysis(i, vBody);
+            if (!vBody[i].empty()) {
+                break;
+            }
+        } else {
+            isKeyword(word) ? throw ErrorMessage("Variable name can not be a keyword!\n")
+                            : ++propertyCount;
+        }
+        ++i;
+    }
+
+    /*
     while (sBody >> word)
     {
         if (isType(word)) {
             sBody >> word;
             if (!word.empty()) {
-                isKeyword(word) ? throw ErrorMessage("Variable can not have name of keyword!\n")
-                                : ++propertyCount;  
+                auto functionStart = word.find('(');
+                if (functionStart != std::string::npos) {
+                    std::string methodName = word.substr(0, functionStart);
+                    while (sBody >> word)
+                    {
+                        if (word.find(')') != std::string::npos) {
+                            
+                            break;
+                        }
+                    }
+                } else {
+                    isKeyword(word) ? throw ErrorMessage("Variable can not have name of keyword!\n")
+                                : ++propertyCount;
+                }
             }
             else {
                 break;
             }
         }
     }
+    */
     std::cout << "Member variables: " << propertyCount << std::endl;
     //std::cout << "Member functions: " << functionCount << std::endl;
 
+}
+
+size_t  Analyzer::functionAnalysis(size_t i, std::vector<std::string> body)
+{
+    std::stringstream   stream(body[i]);
+    std::string         word;
+
+    std::string     functionName;
+    while (stream >> word)
+    {
+        if (isType(word)) {
+            stream >> word;
+            if (word.empty()) {
+                break;
+            }
+            auto isCleanName = word.find("(");
+            if (isCleanName != std::string::npos) {
+                functionName = word.substr(0, isCleanName);
+            } else {
+                functionName = word;
+            }
+        }
+    }
+    stream.clear();
+
+    auto argStart = body[i].find("(");
+    auto argEnd = body[i].find(")");
+    if (argStart == std::string::npos || argEnd == std::string::npos) {
+        throw ErrorMessage("Function's parametrs must be pn the same line as its name\n");
+    }
+    size_t  argCount;
+    std::string argumentScope = body[i].substr(argStart + 1, argEnd);
+
+    std::stringstream    streamScope(argumentScope);
+    while (streamScope >> word)
+    {
+        if (isType(word)) {
+            streamScope >> word;
+            if (word.empty()) {
+                break;
+            }
+            if (isKeyword(word)) {
+                throw ErrorMessage("Argument name can not be a keyword!\n");
+            }
+            ++argCount;
+        }
+    }
+    streamScope.clear();
+    ++i;
+
+    size_t  variableCount;
+    size_t  endIndex;
+    while (!body[i].empty())
+    {
+        auto isEnd = body[i].find("}");
+        if (isEnd != std::string::npos) {
+            endIndex = i;
+            break;
+        }
+        ++i;
+    }
+    std::string tempBody{};
+    while (i < endIndex + 1)
+    {
+        tempBody += body[i++];
+    }
+
+    variableCount = functionVariableCount(tempBody);
+
+    std::cout << functionName << " has " << argCount << " arguments and " << variableCount << " variables in the body\n";
+
+    return endIndex;
+}
+
+size_t  Analyzer::functionVariableCount(std::string& tempBody)
+{
+    std::stringstream   sBody(tempBody);
+    std::string         word;
+
+    size_t  variableCount = 0;
+    while (sBody >> word)
+    {
+        if (isType(word)) {
+            sBody >> word;
+            if (word.empty()) {
+                break;
+            }
+            isKeyword(word) ? throw ErrorMessage("Variable name can not be a keyword!\n")
+                            : ++variableCount;
+        }
+    }
+
+    return variableCount;
 }
 
 void    Analyzer::startAnalysis()

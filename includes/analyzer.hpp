@@ -21,16 +21,18 @@ class Analyzer
        // void        findClass();
         void        findUserDefinedTypes(const std::string& udType);
         void        addUserDefinedType(std::string& body, const std::string& udType);
+        size_t      functionAnalysis(size_t i, std::vector<std::string> v);
+        size_t      functionVariableCount(std::string& str);
         bool        isKeyword(const std::string& value) const;
         bool        isType(const std::string& value) const;
         
         
     private:
-        std::string                     input_;
-        size_t                          variableCount_;
-        size_t                          functionCount_;
-        size_t                          classCount_;
-       // multimap<std::string, size_t>   functions_;
+        std::string                         input_;
+        size_t                              variableCount_;
+        size_t                              functionCount_;
+        size_t                              classCount_;
+        std::multimap<std::string, size_t>  functions_;
         
         std::vector<std::string>    identifierTypes_ = {
             "auto",
