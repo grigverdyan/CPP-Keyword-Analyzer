@@ -25,31 +25,46 @@ std::vector<std::string>  KEYWORDS = {
     "virtual", "void", "volatile", "wchar_t", "while", "xor", "xor_eq"
 };
 
+/*
+ * Constructor with parameters.
+ * Gets the data wich sould be analized
+ * in the string format.
+ */
 Analyzer::Analyzer(std::string& input)
     : input_{input}
 {}
 
+
+/*
+ * Member function which analises the user 
+ * defined types(class, struct, enum class).
+ */
 void    Analyzer::findUserDefinedTypes(const std::string& udType)
 {
     while (true)
     {
         auto classStartIndex = input_.find(udType);
         if (classStartIndex == std::string::npos) {
-            break;;
+            break;
         }
         auto classEndIndex = input_.find("};");
         if (classEndIndex == std::string::npos) {
             throw ErrorMessage("Can not find the appropriate ending of user defined type!\n");
         }
 
-        std::string classBody = input_.substr(classStartIndex + udType.size(), input_.size() - classStartIndex);
+        std::string classBody = input_.substr(classStartIndex + udType.size(), classEndIndex - (classStartIndex + udType.size()));
         std::string temp = input_.substr(0, classStartIndex);
-        temp += input_.substr(classEndIndex + udType.size(), input_.size() - (classEndIndex + udType.size()));
+        temp += input_.substr(classEndIndex + 2 , input_.size() - (classEndIndex + 2));
         input_ = temp;
         addUserDefinedType(classBody, udType);
     }
 }
 
+/*
+ * Member function which adds found user defined type
+ * into the vector of types and does the user defined 
+ * type analysis.
+ */
 void    Analyzer::addUserDefinedType(std::string& body, const std::string& udType)
 {
     std::stringstream   sBody(body);
@@ -60,11 +75,11 @@ void    Analyzer::addUserDefinedType(std::string& body, const std::string& udTyp
     }
     identifierTypes_.push_back(word);
     std::string typeName = word;
-    std::cout << "In " << typeName << " " << udType << ":\n";
+    std::cout << "In " << udType << " " << typeName << ":\n";
     sBody.clear();
     
     auto typeIndex = body.find(typeName);
-    std::string tBody = body.substr(typeIndex + typeName.size(), body.size());
+    std::string tBody = body.substr(typeIndex + typeName.size(), body.size() - (typeIndex + typeName.size()));
     body = tBody;
 
     size_t  propertyCount = 0;
@@ -73,7 +88,7 @@ void    Analyzer::addUserDefinedType(std::string& body, const std::string& udTyp
     {
         auto index = body.find("\n");
         if (index != std::string::npos) {
-            std::string temp = body.substr(index + 1, body.size());
+            std::string temp = body.substr(index + 1, body.size() - (index + 1));
             vBody.push_back(body.substr(0, index));
             body = temp;
         } else {
@@ -97,6 +112,8 @@ void    Analyzer::addUserDefinedType(std::string& body, const std::string& udTyp
         ++i;
     }
 
+    std::cout << "Member variables: " << propertyCount << std::endl;
+    
     /*
     while (sBody >> word)
     {
@@ -124,21 +141,23 @@ void    Analyzer::addUserDefinedType(std::string& body, const std::string& udTyp
         }
     }
     */
-    std::cout << "Member variables: " << propertyCount << std::endl;
     //std::cout << "Member functions: " << functionCount << std::endl;
 
 }
 
+/*
+ * Member function which analyses the function.
+ */
 size_t  Analyzer::functionAnalysis(size_t i, std::vector<std::string> body)
 {
-    std::stringstream   stream(body[i]);
+    std::stringstream   streamFunctionName(body[i]);
     std::string         word;
 
     std::string     functionName;
-    while (stream >> word)
+    while (streamFunctionName >> word)
     {
         if (isType(word)) {
-            stream >> word;
+            streamFunctionName >> word;
             if (word.empty()) {
                 break;
             }
@@ -150,7 +169,7 @@ size_t  Analyzer::functionAnalysis(size_t i, std::vector<std::string> body)
             }
         }
     }
-    stream.clear();
+    streamFunctionName.clear();
 
     auto argStart = body[i].find("(");
     auto argEnd = body[i].find(")");
@@ -158,7 +177,7 @@ size_t  Analyzer::functionAnalysis(size_t i, std::vector<std::string> body)
         throw ErrorMessage("Function's parametrs must be pn the same line as its name\n");
     }
     size_t  argCount;
-    std::string argumentScope = body[i].substr(argStart + 1, argEnd);
+    std::string argumentScope = body[i].substr(argStart + 1, argEnd - (argStart + 1));
 
     std::stringstream    streamScope(argumentScope);
     while (streamScope >> word)
@@ -201,6 +220,10 @@ size_t  Analyzer::functionAnalysis(size_t i, std::vector<std::string> body)
     return endIndex;
 }
 
+/*
+ * Member function which computes variable
+ * count in a function.
+ */
 size_t  Analyzer::functionVariableCount(std::string& tempBody)
 {
     std::stringstream   sBody(tempBody);
@@ -222,12 +245,24 @@ size_t  Analyzer::functionVariableCount(std::string& tempBody)
     return variableCount;
 }
 
+/*
+ * Member function which is so called 
+ * the main function of class.
+ */
 void    Analyzer::startAnalysis()
 {
+    // Find and analize first user defined types
     findUserDefinedTypes("class");
+    findUserDefinedTypes("struct");
+    findUserDefinedTypes("enum class");
+
+    // Global functions analysis
 }
 
-
+/*
+ * Member function which checks if give value is
+ * a C++ keyword or not.
+ */
 bool    Analyzer::isKeyword(const std::string& value) const
 {   
     for (auto& keyword : KEYWORDS)
@@ -238,9 +273,12 @@ bool    Analyzer::isKeyword(const std::string& value) const
     }
     
     return false;
-
 }
 
+/*
+ * Member function which checks if given value is
+ * basic or user defined data type or not.
+ */
 bool    Analyzer::isType(const std::string& value) const
 {
     for (auto& type : identifierTypes_)
@@ -249,6 +287,6 @@ bool    Analyzer::isType(const std::string& value) const
             return true;
         }
     }
-    return false;
 
+    return false;
 }

@@ -26,7 +26,6 @@ class Analyzer
         bool        isKeyword(const std::string& value) const;
         bool        isType(const std::string& value) const;
         
-        
     private:
         std::string                         input_;
         size_t                              variableCount_;
