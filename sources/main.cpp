@@ -5,7 +5,7 @@
 #include "helpers.hpp"
 #include "error_message.hpp"
 #include "file_IO_handler.hpp"
-
+#include "analyzer.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -22,15 +22,22 @@ int main(int argc, char* argv[])
     }
     std::string fileName = argv[1];
 
-    auto    file = std::make_shared<IOFileHandler>("data/" + fileName);
-        
-    std::string handledInput = file->getHandledInput();
-    
+    try {
+        auto    file = std::make_shared<IOFileHandler>("data/" + fileName);
+        auto    analysis = std::make_shared<Analyzer>(file->getHandledInput());    
+        analysis->startAnalysis();
+
+    } catch (const ErrorMessage& error) {
+        error.printErrorMessage();
+        return EXIT_FAILURE;
+    }
+    //std::string handledInput = file->getHandledInput();
+    /*
     //std::cout << handledInput;
     std::stringstream str(handledInput);
     std::string word;
     while (str >> word)
         std::cout << word << std::endl;
-
+*/
     return EXIT_SUCCESS;
 }

@@ -26,6 +26,7 @@ void    IOFileHandler::readFile()
         input_ += line;
         input_ += "\n";
     }
+    input_ += "\n";
     inData.close();
 }
 

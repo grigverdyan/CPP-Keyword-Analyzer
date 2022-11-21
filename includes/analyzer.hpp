@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 class Analyzer
 {
@@ -14,18 +15,22 @@ class Analyzer
         ~Analyzer() = default;
 
     public:
-
+        void        startAnalysis();
 
     private:
        // void        findClass();
+        void        findUserDefinedTypes(const std::string& udType);
+        void        addUserDefinedType(std::string& body, const std::string& udType);
         bool        isKeyword(const std::string& value) const;
         bool        isType(const std::string& value) const;
         
+        
     private:
-        std::string     input_;
-        size_t          variableCount_;
-        size_t          functionCount_;
-        size_t          classCount_;
+        std::string                     input_;
+        size_t                          variableCount_;
+        size_t                          functionCount_;
+        size_t                          classCount_;
+       // multimap<std::string, size_t>   functions_;
         
         std::vector<std::string>    identifierTypes_ = {
             "auto",
@@ -43,13 +48,12 @@ class Analyzer
             "unsigned",
             "void",
             "wchar_t",
-            "std::string"
         };
 
 
 };
 
-std::vector<std::string>    KEYWORDS = {
+extern  std::vector<std::string>    KEYWORDS;/* = {
     "alignas", "alignof", "and", "and_eq", "asm",
     "atomic_cancel", "atomic_commit", "atomic_noexcept",
     "auto", "bitand", "bitor", "bool", "break", "case",
@@ -69,4 +73,5 @@ std::vector<std::string>    KEYWORDS = {
     "typedef", "typeid", "typename", "union", "unsigned", "using",
     "virtual", "void", "volatile", "wchar_t", "while", "xor", "xor_eq"
 };
+*/
 #endif  // ANALYZER_H
