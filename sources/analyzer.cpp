@@ -204,6 +204,7 @@ size_t  Analyzer::functionAnalysis(size_t i, std::vector<std::string> body)
 
 void  Analyzer::functionAnalysis()
 {
+    //std::cout << input_;
     std::stringstream   streamFunctionName(input_);
     std::string         word;
     std::string         funcReturnType;
@@ -237,7 +238,7 @@ void  Analyzer::functionAnalysis()
         throw ErrorMessage("Error occured during parsing!\n");
     }
 
-    std::string funcBody = input_.substr(fStart, fEnd - fStart);
+    std::string funcBody = input_.substr(fStart, fEnd  - fStart + 1);
     std::string temp = input_.substr(0, fStart);
     temp += input_.substr(fEnd + 1, input_.size() - fEnd - 1);
     input_ = temp;
@@ -247,10 +248,11 @@ void  Analyzer::functionAnalysis()
     if (argStart == std::string::npos || argEnd == std::string::npos) {
         throw ErrorMessage("Function's parameters must be on the same line as its name\n");
     }
-    size_t  argCount;
-    std::string argumentScope = input_.substr(argStart + 1, argEnd - (argStart + 1));
-    
-    std::cout << funcBody;
+    size_t  argCount = 0;
+    //std::cout << funcBody;
+    std::string argumentScope = funcBody.substr(argStart + 1, argEnd - argStart - 1);
+   
+   // std::cout << argumentScope; 
 
     std::stringstream    streamScope(argumentScope);
     while (streamScope >> word)
@@ -268,9 +270,9 @@ void  Analyzer::functionAnalysis()
     }
     streamScope.clear();
     
-    funcBody = funcBody.substr(argEnd + 1, funcBody.size() - argEnd - 1);
+    funcBody = funcBody.substr(argEnd + 1, funcBody.size() - argEnd + 1);
     size_t  variableCount = functionVariableCount(funcBody);
-
+    //std::cout << funcBody;
     outputStream_ << functionName << " has " << argCount << " arguments and " << variableCount << " variables in the body\n";
 }
 
@@ -291,10 +293,13 @@ size_t  Analyzer::functionVariableCount(std::string& tempBody)
             if (word.empty()) {
                 break;
             }
-            isKeyword(word) ? throw ErrorMessage("Variable name can not be a keyword!\n")
-                            : ++variableCount;
+            if (isKeyword(word)) {
+                throw ErrorMessage("Variable name can not be a keyword!\n");
+            }
+            ++variableCount;
         }
     }
+    sBody.clear();
 
     return variableCount;
 }
@@ -306,7 +311,7 @@ size_t  Analyzer::functionVariableCount(std::string& tempBody)
 void    Analyzer::startAnalysis()
 {
     // Find and analize first user defined types
-    //findUserDefinedTypes("class");
+    findUserDefinedTypes("class");
     //findUserDefinedTypes("struct");
     //findUserDefinedTypes("enum class");
 

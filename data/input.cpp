@@ -11,7 +11,7 @@ double b = 4;
  *
  *
  *
- *
+ */
 class Mlass
 {
 public:
@@ -28,7 +28,7 @@ protected:
         // doing nothing
     }
 };
-
+/*
 // coment moment
 struct Mruct
 {
