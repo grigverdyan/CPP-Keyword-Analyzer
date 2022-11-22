@@ -1,5 +1,6 @@
 #include <iostream>
 #include <sstream>
+#include <fstream>
 
 #include "analyzer.hpp"
 #include "error_message.hpp"
@@ -28,10 +29,11 @@ std::vector<std::string>  KEYWORDS = {
 /*
  * Constructor with parameters.
  * Gets the data wich sould be analized
- * in the string format.
+ * in the string format and a file name in which
+ * should be showed analysis results.
  */
-Analyzer::Analyzer(std::string& input)
-    : input_{input}
+Analyzer::Analyzer(std::string& input, const std::string& outputFile)
+    : input_{input}, outputFile_{outputFile}
 {}
 
 
@@ -75,7 +77,7 @@ void    Analyzer::addUserDefinedType(std::string& body, const std::string& udTyp
     }
     identifierTypes_.push_back(word);
     std::string typeName = word;
-    std::cout << "In " << udType << " " << typeName << ":\n";
+    outputStream_ << "In " << udType << " " << typeName << ":\n";
     sBody.clear();
     
     auto typeIndex = body.find(typeName);
@@ -112,37 +114,7 @@ void    Analyzer::addUserDefinedType(std::string& body, const std::string& udTyp
         ++i;
     }
 
-    std::cout << "Member variables: " << propertyCount << std::endl;
-    
-    /*
-    while (sBody >> word)
-    {
-        if (isType(word)) {
-            sBody >> word;
-            if (!word.empty()) {
-                auto functionStart = word.find('(');
-                if (functionStart != std::string::npos) {
-                    std::string methodName = word.substr(0, functionStart);
-                    while (sBody >> word)
-                    {
-                        if (word.find(')') != std::string::npos) {
-                            
-                            break;
-                        }
-                    }
-                } else {
-                    isKeyword(word) ? throw ErrorMessage("Variable can not have name of keyword!\n")
-                                : ++propertyCount;
-                }
-            }
-            else {
-                break;
-            }
-        }
-    }
-    */
-    //std::cout << "Member functions: " << functionCount << std::endl;
-
+    outputStream_ << "Member variables: " << propertyCount << std::endl;
 }
 
 /*
@@ -215,7 +187,7 @@ size_t  Analyzer::functionAnalysis(size_t i, std::vector<std::string> body)
 
     variableCount = functionVariableCount(tempBody);
 
-    std::cout << functionName << " has " << argCount << " arguments and " << variableCount << " variables in the body\n";
+    outputStream_ << functionName << " has " << argCount << " arguments and " << variableCount << " variables in the body\n";
 
     return endIndex;
 }
@@ -289,4 +261,24 @@ bool    Analyzer::isType(const std::string& value) const
     }
 
     return false;
+}
+
+/*
+ * Member function which writes results in a file.
+ */
+void    Analyzer::writeResults()
+{
+    std::fstream    out;
+    std::string     outString = outputStream_.str();
+
+    out.open(outputFile_, std::ios::out);
+
+    if (!out.is_open()) {
+        throw ErrorMessage("Could not show analysis results with a file!\n");
+    }
+    
+    out << outString;
+    out.close();
+
+    std::cout << "Analysis successfully written in " << outputFile_ << " file!\n";
 }

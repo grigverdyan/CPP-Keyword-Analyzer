@@ -9,7 +9,7 @@ class Analyzer
 {
     public:
         Analyzer() = delete;
-        Analyzer(std::string& input);
+        Analyzer(std::string& input, const std::string& outputFile);
         Analyzer(const Analyzer& other) = delete;
         Analyzer& operator=(const Analyzer& rhs) = delete;
         ~Analyzer() = default;
@@ -18,20 +18,18 @@ class Analyzer
         void        startAnalysis();
 
     private:
-       // void        findClass();
         void        findUserDefinedTypes(const std::string& udType);
         void        addUserDefinedType(std::string& body, const std::string& udType);
         size_t      functionAnalysis(size_t i, std::vector<std::string> v);
         size_t      functionVariableCount(std::string& str);
         bool        isKeyword(const std::string& value) const;
         bool        isType(const std::string& value) const;
-        
+        void        writeResults();
+    
     private:
-        std::string                         input_;
-        size_t                              variableCount_;
-        size_t                              functionCount_;
-        size_t                              classCount_;
-        std::multimap<std::string, size_t>  functions_;
+        std::string             input_;
+        const std::string       outputFile_;
+        std::stringstream       outputStream_;
         
         std::vector<std::string>    identifierTypes_ = {
             "auto",

@@ -19,7 +19,7 @@ int main(int argc, char* argv[]) try
     std::string fileName = argv[1];
 
     auto    file = std::make_shared<IOFileHandler>("data/" + fileName);
-    auto    analysis = std::make_shared<Analyzer>(file->getHandledInput());    
+    auto    analysis = std::make_shared<Analyzer>(file->getHandledInput(), "data/analysis.txt");    
     analysis->startAnalysis();
     
     return EXIT_SUCCESS;
