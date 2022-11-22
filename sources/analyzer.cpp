@@ -99,6 +99,9 @@ void    Analyzer::addUserDefinedType(std::string& body, const std::string& udTyp
             }
 
         } else {
+            break;
+        } 
+        /*else {
             std::stringstream   temp(body);
             while (temp >> word)
             {
@@ -109,7 +112,7 @@ void    Analyzer::addUserDefinedType(std::string& body, const std::string& udTyp
                 }
             }
             temp.clear();
-        }
+        }*/
     }
     outputStream_ << "Member variables: " << propertyCount << std::endl;
 }
@@ -117,161 +120,9 @@ void    Analyzer::addUserDefinedType(std::string& body, const std::string& udTyp
 /*
  * Member function which analyses the function.
  */
-void  Analyzer::functionAnalysis(std::string& body)
+void  Analyzer::functionAnalysis(std::string& input)
 {
-    std::stringstream   streamFunctionName(body);
-    std::string         word;
-    std::string         funcReturnType;
-
-    std::string     functionName;
-    while (streamFunctionName >> word)
-    {
-        if (isType(word)) {
-            funcReturnType = word;
-            streamFunctionName >> word;
-            if (word.empty()) {
-                break;
-            }
-            auto isCleanName = word.find("(");
-            if (isCleanName != std::string::npos) {
-                functionName = word.substr(0, isCleanName);
-            } else {
-                functionName = word;
-            }
-            break;
-        }
-    }
-    streamFunctionName.clear();
-
-    auto fStart = body.find(funcReturnType);
-    if (fStart == std::string::npos) {
-        throw ErrorMessage("Error occured during parsing!\n");
-    }
-    auto fEnd = body.find("}");
-    if (fEnd == std::string::npos) { 
-        throw ErrorMessage("Error occured during parsing!\n");
-    }
-
-    std::string funcBody = body.substr(fStart, fEnd  - fStart + 1);
-    std::string temp = body.substr(0, fStart);
-    temp += body.substr(fEnd + 1, input_.size() - fEnd - 1);
-    body = temp;
-
-    auto argStart = funcBody.find("(");
-    auto argEnd = funcBody.find(")");
-    if (argStart == std::string::npos || argEnd == std::string::npos) {
-        throw ErrorMessage("Function's parameters must be on the same line as its name\n");
-    }
-    size_t  argCount = 0;
-    std::string argumentScope = funcBody.substr(argStart + 1, argEnd - argStart - 1);
-   
-
-    std::stringstream    streamScope(argumentScope);
-    while (streamScope >> word)
-    {
-        if (isType(word)) {
-            streamScope >> word;
-            if (word.empty()) {
-                break;
-            }
-            if (isKeyword(word)) {
-                throw ErrorMessage("Argument name can not be a keyword!\n");
-            }
-            ++argCount;
-        }
-    }
-    streamScope.clear();
-    
-    funcBody = funcBody.substr(argEnd + 1, funcBody.size() - argEnd + 1);
-    size_t  variableCount = functionVariableCount(funcBody);
-    outputStream_ << functionName << " has " << argCount << " arguments and " << variableCount << " variables in the body\n";
-}
-
-/*
-{
-    std::stringstream   streamFunctionName(body);
-    std::string         word;
-    std::string         funcReturnType;
-
-    std::string     functionName;
-    while (streamFunctionName >> word)
-    {
-        if (isType(word)) {
-            funcReturnType = word;
-            streamFunctionName >> word;
-            if (word.empty()) {
-                break;
-            }
-            auto isCleanName = word.find("(");
-            if (isCleanName != std::string::npos) {
-                functionName = word.substr(0, isCleanName);
-            } else {
-                functionName = word;
-            }
-            break;
-        }
-    }
-    streamFunctionName.clear();
-    
-    std::string funcBody;
-    size_t  endIndex = 0;
-    while (!body[i].empty())
-    {
-        auto fEnd = body[i].find("}");
-        if (fEnd != std::string::npos) {
-            endIndex = i;
-            break;
-        }
-        ++i;
-    }
-
-    while (i < endIndex + 1)
-    {
-        funcBody += body[i++];
-    }
-
-    auto fStart = funcBody.find(funcReturnType);
-    auto fEnd = funcBody.find("}");
-    if (fStart == std::string::npos || fEnd == std::string::npos) {
-        throw ErrorMessage("Error occured during parsing!\n");
-    }
-    funcBody = funcBody.find(fStart, fEnd - fStart + 1);
-
-    auto argStart = funcBody.find("(");
-    auto argEnd = funcBody.find(")");
-    if (argStart == std::string::npos || argEnd == std::string::npos) {
-        throw ErrorMessage("Function's parametrs must be pn the same line as its name\n");
-    }
-    size_t  argCount;
-    std::string argumentScope = funcBody.substr(argStart + 1, argEnd - argStart - 1);
-
-    std::stringstream    streamScope(argumentScope);
-    while (streamScope >> word)
-    {
-        if (isType(word)) {
-            streamScope >> word;
-            if (word.empty()) {
-                break;
-            }
-            if (isKeyword(word)) {
-                throw ErrorMessage("Argument name can not be a keyword!\n");
-            }
-            ++argCount;
-        }
-    }
-    streamScope.clear();
-    funcBody = funcBody.substr(argEnd + 1, funcBody.size() - argEnd + 1);
-    size_t  variableCount = functionVariableCount(funcBody);
-
-    outputStream_ << functionName << " has " << argCount << " arguments and " << variableCount << " variables in the body\n";
-
-    return endIndex;
-}
-*/
-void  Analyzer::functionAnalysis()
-{
-    //std::cout << input_;
-    std::stringstream   streamFunctionName(input_);
+    std::stringstream   streamFunctionName(input);
     std::string         word;
     std::string         funcReturnType;
 
@@ -303,11 +154,11 @@ void  Analyzer::functionAnalysis()
     if (fEnd == std::string::npos) { 
         throw ErrorMessage("Error occured during parsing!\n");
     }
-
-    std::string funcBody = input_.substr(fStart, fEnd  - fStart + 1);
-    std::string temp = input_.substr(0, fStart);
-    temp += input_.substr(fEnd + 1, input_.size() - fEnd - 1);
-    input_ = temp;
+    std::string funcBody = input.substr(fStart, fEnd  - fStart + 1);
+    std::string temp = input.substr(0, fStart);
+    std::cout << temp;
+    temp += input.substr(fEnd + 1, input_.size() - fEnd - 1);
+    input = temp;
 
     auto argStart = funcBody.find("(");
     auto argEnd = funcBody.find(")");
@@ -315,11 +166,8 @@ void  Analyzer::functionAnalysis()
         throw ErrorMessage("Function's parameters must be on the same line as its name\n");
     }
     size_t  argCount = 0;
-    //std::cout << funcBody;
     std::string argumentScope = funcBody.substr(argStart + 1, argEnd - argStart - 1);
    
-   // std::cout << argumentScope; 
-
     std::stringstream    streamScope(argumentScope);
     while (streamScope >> word)
     {
@@ -376,15 +224,12 @@ size_t  Analyzer::functionVariableCount(std::string& tempBody)
 void    Analyzer::startAnalysis()
 {
     // Find and analize first user defined types
-    findUserDefinedTypes("class");
+    //findUserDefinedTypes("class");
     //findUserDefinedTypes("struct");
     //findUserDefinedTypes("enum class");
 
     // Global functions analysis
-    
-    //for (auto& type : identifierTypes_)
-    //    std::cout << type << std::endl; 
-   // functionAnalysis();
+    functionAnalysis(input_);
     writeResults();
 }
 

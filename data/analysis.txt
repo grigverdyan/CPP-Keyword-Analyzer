@@ -1,2 +1,1 @@
-In class Mlass:
-main has 2 arguments and 1 variables in the body
+displayNum has 2 arguments and 2 variables in the body
