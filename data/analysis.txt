@@ -1,3 +1,2 @@
 In class Mlass:
-Member variables: 0
 main has 2 arguments and 1 variables in the body

@@ -23,7 +23,7 @@ public:
     }
 protected:
     int c = 7;
-    int function()
+    int function(int a)
     {
         // doing nothing
     }
@@ -50,12 +50,10 @@ private:
     }
 };
 */
-
 int main(int argc, char *argv[])
 {
     Mlass ob;
     Mruct mob(6);
 }
-
 
 eof
