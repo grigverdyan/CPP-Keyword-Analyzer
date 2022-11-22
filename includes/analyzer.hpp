@@ -20,6 +20,7 @@ class Analyzer
     private:
         void        findUserDefinedTypes(const std::string& udType);
         void        addUserDefinedType(std::string& body, const std::string& udType);
+        void        functionAnalysis();
         size_t      functionAnalysis(size_t i, std::vector<std::string> v);
         size_t      functionVariableCount(std::string& str);
         bool        isKeyword(const std::string& value) const;

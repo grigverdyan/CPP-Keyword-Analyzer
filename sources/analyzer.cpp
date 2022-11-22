@@ -108,11 +108,19 @@ void    Analyzer::addUserDefinedType(std::string& body, const std::string& udTyp
                 break;
             }
         } else {
-            isKeyword(word) ? throw ErrorMessage("Variable name can not be a keyword!\n")
-                            : ++propertyCount;
+            std::stringstream   temp(vBody[i]);
+            while (temp >> word)
+            {
+                isKeyword(word) ? throw ErrorMessage("Variable name can not be a keyword!\n")
+                                : ++propertyCount;
+            }
+            temp.clear();
         }
         ++i;
     }
+    
+    //for (auto& i : vBody)
+      //  std::cout << i << std::endl;
 
     outputStream_ << "Member variables: " << propertyCount << std::endl;
 }
@@ -136,8 +144,10 @@ size_t  Analyzer::functionAnalysis(size_t i, std::vector<std::string> body)
             auto isCleanName = word.find("(");
             if (isCleanName != std::string::npos) {
                 functionName = word.substr(0, isCleanName);
+                break;
             } else {
                 functionName = word;
+                break;
             }
         }
     }
@@ -192,6 +202,78 @@ size_t  Analyzer::functionAnalysis(size_t i, std::vector<std::string> body)
     return endIndex;
 }
 
+void  Analyzer::functionAnalysis()
+{
+    std::stringstream   streamFunctionName(input_);
+    std::string         word;
+    std::string         funcReturnType;
+
+    std::string     functionName;
+    while (streamFunctionName >> word)
+    {
+        if (isType(word)) {
+            funcReturnType = word;
+            streamFunctionName >> word;
+            if (word.empty()) {
+                break;
+            }
+            auto isCleanName = word.find("(");
+            if (isCleanName != std::string::npos) {
+                functionName = word.substr(0, isCleanName);
+            } else {
+                functionName = word;
+            }
+            break;
+        }
+    }
+    streamFunctionName.clear();
+
+    auto fStart = input_.find(funcReturnType);
+    if (fStart == std::string::npos) {
+        throw ErrorMessage("Error occured during parsing!\n");
+    }
+    auto fEnd = input_.find("}");
+    if (fEnd == std::string::npos) { 
+        throw ErrorMessage("Error occured during parsing!\n");
+    }
+
+    std::string funcBody = input_.substr(fStart, fEnd - fStart);
+    std::string temp = input_.substr(0, fStart);
+    temp += input_.substr(fEnd + 1, input_.size() - fEnd - 1);
+    input_ = temp;
+
+    auto argStart = funcBody.find("(");
+    auto argEnd = funcBody.find(")");
+    if (argStart == std::string::npos || argEnd == std::string::npos) {
+        throw ErrorMessage("Function's parameters must be on the same line as its name\n");
+    }
+    size_t  argCount;
+    std::string argumentScope = input_.substr(argStart + 1, argEnd - (argStart + 1));
+    
+    std::cout << funcBody;
+
+    std::stringstream    streamScope(argumentScope);
+    while (streamScope >> word)
+    {
+        if (isType(word)) {
+            streamScope >> word;
+            if (word.empty()) {
+                break;
+            }
+            if (isKeyword(word)) {
+                throw ErrorMessage("Argument name can not be a keyword!\n");
+            }
+            ++argCount;
+        }
+    }
+    streamScope.clear();
+    
+    funcBody = funcBody.substr(argEnd + 1, funcBody.size() - argEnd - 1);
+    size_t  variableCount = functionVariableCount(funcBody);
+
+    outputStream_ << functionName << " has " << argCount << " arguments and " << variableCount << " variables in the body\n";
+}
+
 /*
  * Member function which computes variable
  * count in a function.
@@ -224,11 +306,16 @@ size_t  Analyzer::functionVariableCount(std::string& tempBody)
 void    Analyzer::startAnalysis()
 {
     // Find and analize first user defined types
-    findUserDefinedTypes("class");
-    findUserDefinedTypes("struct");
-    findUserDefinedTypes("enum class");
+    //findUserDefinedTypes("class");
+    //findUserDefinedTypes("struct");
+    //findUserDefinedTypes("enum class");
 
     // Global functions analysis
+    
+    //for (auto& type : identifierTypes_)
+    //    std::cout << type << std::endl; 
+    functionAnalysis();
+    writeResults();
 }
 
 /*

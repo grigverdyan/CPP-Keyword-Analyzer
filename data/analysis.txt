@@ -1,0 +1,4 @@
+In class Mlass:
+Member variables: 0
+In struct Mruct:
+Member variables: 0
